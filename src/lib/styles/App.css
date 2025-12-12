@@ -1,0 +1,88 @@
+:root {
+	font-family: 'Sansation', system-ui, Avenir, Helvetica, Arial, sans-serif;
+	line-height: 1.5;
+	font-weight: 400;
+
+	color-scheme: light dark;
+	color: #242424;
+	background-color: white;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	--navbar-height: 70px;
+
+	--color-background: #f5faff;
+	--color-primary: #3e8eff;
+	--color-primary-dark: #2c65b5;
+	--color-secondary: black;
+}
+
+body {
+	width: 100vw;
+	height: 100vh;
+	background-color: var(--color-background);
+}
+
+.gallery-lock-gradient {
+	background: #ff4de8;
+	background: -webkit-linear-gradient(204deg, rgba(255, 77, 232, 1) 0%, rgba(255, 39, 39, 1) 100%);
+	background: -moz-linear-gradient(204deg, rgba(255, 77, 232, 1) 0%, rgba(255, 39, 39, 1) 100%);
+	background: linear-gradient(204deg, rgba(255, 77, 232, 1) 0%, rgba(255, 39, 39, 1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#FF4DE8", endColorstr="#FF2727", GradientType=0);
+}
+
+.background-pattern {
+	background-size: 1024px;
+	background-image: url('/src/lib/assets/backgrounds/pattern.svg');
+	background-repeat: repeat;
+	background-position: center;
+}
+
+a {
+	font-weight: 500;
+	color: #646cff;
+	text-decoration: inherit;
+}
+
+a:hover {
+	color: #535bf2;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+.section {
+	width: 100%;
+	padding: 100px 200px;
+	align-self: center;
+}
+
+@media (max-width: 1280px) {
+	.section {
+		padding: 100px 100px;
+	}
+}
+
+@media (max-width: 900px) {
+	.section {
+		padding: 50px 50px;
+	}
+}
+
+@media (max-width: 400px) {
+	.section {
+		max-width: 600px;
+		padding: 20px 20px;
+	}
+}
