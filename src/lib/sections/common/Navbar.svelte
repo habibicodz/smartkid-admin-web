@@ -39,7 +39,7 @@
 	header {
 		display: flex;
 		justify-content: space-between;
-		padding: 0px 50px;
+		padding: 0px 20px;
 		align-items: center;
 		width: 100%;
 		height: var(--navbar-height);

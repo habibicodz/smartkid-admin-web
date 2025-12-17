@@ -13,13 +13,12 @@
 <style>
 	button {
 		width: 100%;
-		background-color: rgb(247, 247, 247);
+		background-color: rgb(250, 250, 250);
 		border: none;
-		padding: 20px;
+		padding: 15px;
 		border-radius: 10px;
 		cursor: pointer;
 		color: black;
-		font-weight: bold;
 		font-size: 1rem;
 		text-align: left;
 	}
@@ -29,11 +28,11 @@
 	}
 
 	.selected {
-		color: white;
 		background-color: var(--color-primary);
+		color: white;
 	}
 
 	.selected:hover {
-		color: white;
+		background-color: var(--color-primary-dark);
 	}
 </style>

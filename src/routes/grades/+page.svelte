@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import SideMenuButton from '$lib/components/buttons/SideMenuButton.svelte';
-	import { grades } from '$lib/utils/fakedata';
-
+	let { data } = $props();
 	const navigateTo = (path: string) => {
 		goto(path);
 	};
@@ -13,7 +12,7 @@
 		<h1 class="title">Grades</h1>
 
 		<div class="sidebar-scroll">
-			{#each grades as grade}
+			{#each data.result as grade}
 				<SideMenuButton
 					isSelected={false}
 					title={grade.name}
@@ -23,9 +22,7 @@
 		</div>
 	</div>
 
-	<div class="content-container">
-		
-	</div>
+	<div class="content-container"></div>
 </section>
 
 <style>
@@ -34,17 +31,17 @@
 		width: 100%;
 		height: calc(100vh - var(--navbar-height));
 		display: flex;
-		overflow: hidden;        /* prevents double scrollbar */
+		overflow: hidden; /* prevents double scrollbar */
 	}
 
 	/* Sidebar container */
 	.sidebar {
-		width: 400px;
+		width: 300px;
 		background-color: white;
 		border-right: 1px solid #ddd;
 		display: flex;
 		flex-direction: column;
-		padding: 20px 50px;
+		padding: 20px;
 	}
 
 	.title {

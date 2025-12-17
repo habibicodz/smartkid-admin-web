@@ -41,5 +41,9 @@
 		.screen-warning-container {
 			display: flex;
 		}
+
+		main {
+			overflow: hidden;
+		}
 	}
 </style>
