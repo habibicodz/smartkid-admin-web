@@ -12,13 +12,14 @@
 		<h1 class="title">Grades</h1>
 
 		<div class="sidebar-scroll">
-			{#each data.result as grade}
+			{#each data.grades as grade}
 				<SideMenuButton
 					isSelected={false}
 					title={grade.name}
 					onclick={() => navigateTo(`/grades/${grade.id}`)}
 				/>
 			{/each}
+			<SideMenuButton isSelected={false} title="Add Grade" onclick={() => {}} />
 		</div>
 	</div>
 

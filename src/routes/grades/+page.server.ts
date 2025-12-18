@@ -1,10 +1,10 @@
-import { getClients } from "$lib/server/database";
+import { supabase } from "$lib/supabaseClient";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = () => {
-    const grades = getClients();
-
+export const load: PageServerLoad = async () => {
+    const { data } = await supabase.from("grades").select();
+    console.log(data);
     return {
-        result: grades
-    };
+        grades: data ?? []
+    }
 }
