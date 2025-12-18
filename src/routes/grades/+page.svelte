@@ -1,11 +1,28 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import SideMenuButton from '$lib/components/buttons/SideMenuButton.svelte';
+	import AddContentNodeDialog from '$lib/components/dialogs/AddContentNodeDialog.svelte';
+
 	let { data } = $props();
+
+	let showAddDialog = $state(false);
+
 	const navigateTo = (path: string) => {
 		goto(path);
 	};
+
+	function openDialog() {
+		showAddDialog = true;
+	}
+
+	function closeDialog() {
+		showAddDialog = false;
+	}
 </script>
+
+{#if showAddDialog}
+	<AddContentNodeDialog grade={null} onclose={closeDialog} />
+{/if}
 
 <section class="main-container">
 	<div class="sidebar">
@@ -19,7 +36,7 @@
 					onclick={() => navigateTo(`/grades/${grade.id}`)}
 				/>
 			{/each}
-			<SideMenuButton isSelected={false} title="Add Grade" onclick={() => {}} />
+			<SideMenuButton isSelected={false} title="Add Grade" onclick={openDialog} />
 		</div>
 	</div>
 
