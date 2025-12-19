@@ -2,12 +2,18 @@
 	let { dialog = $bindable(), children, onclose } = $props();
 </script>
 
-<dialog bind:this={dialog} onclick={(event) => {
-	onclose();
-}}>
-	<div class="dialog" onclick={(event) => {
-		event.stopPropagation();
-	}}>
+<dialog
+	bind:this={dialog}
+	onclick={(event) => {
+		onclose();
+	}}
+>
+	<div
+		class="dialog"
+		onclick={(event) => {
+			event.stopPropagation();
+		}}
+	>
 		{@render children()}
 	</div>
 </dialog>
