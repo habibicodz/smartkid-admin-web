@@ -4,26 +4,26 @@
 	let isCreateNew = $derived(grade == null);
 </script>
 
-<Dialog {onclose}>
-	<h3>
-		{isCreateNew ? 'Create' : 'Update'} Grade
-	</h3>
+<form method="POST" action="?/create_grade">
+	<Dialog {onclose}>
+		<h3>
+			{isCreateNew ? 'Create' : 'Update'} Grade
+		</h3>
 
-	<div class="input-group">
-		<label for="name">Enter Grade Name</label>
-		<input type="text" name="name" id="" />
-	</div>
+		<div class="input-group">
+			<label for="name">Enter Grade Name</label>
+			<input type="text" name="name" id="" />
+		</div>
 
-	<div class="input-group"></div>
+		<div class="actions-container">
+			<button class="cancel-btn" onclick={onclose}>Cancel</button>
 
-	<div class="actions-container">
-		<button>Cancel</button>
-
-		<button type="submit">
-			{isCreateNew ? 'Create' : 'Update'}
-		</button>
-	</div>
-</Dialog>
+			<button type="submit">
+				{isCreateNew ? 'Create' : 'Update'}
+			</button>
+		</div>
+	</Dialog>
+</form>
 
 <style>
 	h3 {
@@ -33,6 +33,7 @@
 
 	.actions-container {
 		display: flex;
+		justify-content: end;
 		flex-direction: row;
 		gap: 10px;
 	}
@@ -55,10 +56,17 @@
 		gap: 5px;
 	}
 
+	.cancel-btn {
+		background-color: rgb(224, 224, 224) !important;
+		color: black !important;
+	}
+
 	input[type='text'] {
 		background-color: rgb(231, 231, 231);
 		border: none;
 		border-radius: 5px;
 		padding: 10px;
+		color: black;
+		font-size: 1rem;
 	}
 </style>
