@@ -2,10 +2,16 @@
 	import { goto } from '$app/navigation';
 	import SideMenuButton from '$lib/components/buttons/SideMenuButton.svelte';
 	import AddContentNodeDialog from '$lib/components/dialogs/AddContentNodeDialog.svelte';
-
-	let { data } = $props();
+	import { supabaseClient } from '$lib/supabase_db/client/supabaseClient';
 
 	let showAddDialog = $state(false);
+
+	const grades = supabaseClient
+		.channel('realtime_grade_changes')
+		.on('postgres_changes', {
+			event: "*",
+		}, {})
+		.subscribe();
 
 	const navigateTo = (path: string) => {
 		goto(path);
@@ -18,6 +24,8 @@
 	function closeDialog() {
 		showAddDialog = false;
 	}
+
+	$effect(() => {});
 </script>
 
 {#if showAddDialog}
@@ -29,7 +37,7 @@
 		<h1 class="title">Grades</h1>
 
 		<div class="sidebar-scroll">
-			{#each data.grades as grade}
+			{#each grades as grade}
 				<SideMenuButton
 					isSelected={false}
 					title={grade.name}
