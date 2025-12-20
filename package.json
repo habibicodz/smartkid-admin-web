@@ -16,10 +16,13 @@
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
 		"@eslint/js": "^9.39.1",
+		"@internationalized/date": "^3.10.1",
+		"@lucide/svelte": "^0.562.0",
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/kit": "^2.48.5",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@types/node": "^22",
+		"clsx": "^2.1.1",
 		"eslint": "^9.39.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.13.0",
@@ -35,6 +38,8 @@
 	},
 	"dependencies": {
 		"@supabase/ssr": "^0.8.0",
-		"@supabase/supabase-js": "^2.87.1"
+		"@supabase/supabase-js": "^2.87.1",
+		"@tailwindcss/vite": "^4.1.18",
+		"tailwindcss": "^4.1.18"
 	}
 }

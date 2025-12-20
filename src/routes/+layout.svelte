@@ -1,14 +1,35 @@
 <script lang="ts">
-	import Navbar from '$lib/sections/common/Navbar.svelte';
 	import SEO from '$lib/SEO.svelte';
 	import '$lib/styles/App.css';
+	import Sidebar from '$lib/components/Sidebar.svelte';
+	import { AppStateClass, getAppContext, setAppContext } from '$lib/state/AppState.svelte';
+	import { onMount } from 'svelte';
 	let { children } = $props();
+
+	setAppContext(new AppStateClass());
+
+	const appContext = getAppContext();
+
+	const prepareAppState = async () => {
+		await appContext.loadInitialData();
+		appContext.gradesChanges.subscribe();
+	};
+
+	onMount(() => {
+		console.log('On Mount is called');
+		prepareAppState();
+		return () => appContext.gradesChanges.unsubscribe();
+	});
 </script>
 
-<main>
-	<SEO />
-	<Navbar />
-	{@render children()}
+<SEO />
+
+<main class="main-container">
+	<Sidebar />
+
+	<div class="content-container">
+		{@render children()}
+	</div>
 
 	<div class="screen-warning-container">
 		<h2>Screen size is not compatible</h2>
@@ -35,6 +56,21 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+	}
+
+	/* Entire page layout */
+	.main-container {
+		width: 100%;
+		height: calc(100vh);
+		display: flex;
+		overflow: hidden; /* prevents double scrollbar */
+	}
+
+	/* Main content */
+	.content-container {
+		flex: 1;
+		overflow-y: auto;
+		padding: 40px;
 	}
 
 	@media (max-width: 900px) {

@@ -44,7 +44,7 @@
 		padding: 20px;
 		background-color: white;
 		color: black;
-		border: 1px solid #ebebeb;
+		border: 1px solid #d1d0d0;
 		border-radius: 10px;
 	}
 </style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import logo from '$lib/assets/applogo.svg';
 	import { afterNavigate, goto } from '$app/navigation';
 	import NavMenuButton from '$lib/components/buttons/NavMenuButton.svelte';
 
@@ -12,7 +13,7 @@
 <section>
 	<header>
 		<button class="title" type="button" onclick={() => navigateTo('/')}
-			><h2>Smartkid Admin</h2></button
+			><img class="logo" src={logo} alt="App logo" /></button
 		>
 		<nav>
 			<ul>
@@ -51,6 +52,10 @@
 		color: black;
 		border: none;
 		cursor: pointer;
+	}
+
+	.logo {
+		width: 150px;
 	}
 
 	ul {
