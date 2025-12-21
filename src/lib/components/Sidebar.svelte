@@ -4,7 +4,7 @@
 	import SideMenuButton from './buttons/SideMenuButton.svelte';
 	import AddGradeDialog from './dialogs/AddGradeDialog.svelte';
 	import { getAppContext } from '$lib/state/AppState.svelte';
-
+	
 	let appContext = getAppContext();
 	let showAddDialog = $state(false);
 
