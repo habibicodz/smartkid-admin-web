@@ -14,6 +14,7 @@
 	let isProgress = $state(false);
 	let isCreateNew = $derived(grade == null);
 	let gradeName = $state('');
+	let gradeNumber = $state(0);
 
 	const submitOrCreateGrade = async () => {
 		if (isProgress) return;
@@ -27,7 +28,10 @@
 		if (grade != null) {
 			throw "";
 		}
-		await createGrade(gradeName);
+		await createGrade({
+			"name": gradeName,
+			"number": gradeNumber
+		});
 		isProgress = false;
 		onclose();
 	};
@@ -37,6 +41,11 @@
 	<h3>
 		{isCreateNew ? 'Create' : 'Update'} Grade
 	</h3>
+
+	<div class="input-group">
+		<label for="number">Enter Grade Number ( 1 - 10)</label>
+		<input autocomplete="off" type="text" bind:value={gradeNumber} name="number" id="" />
+	</div>
 
 	<div class="input-group">
 		<label for="name">Enter Grade Name</label>

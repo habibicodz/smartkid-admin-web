@@ -14,23 +14,239 @@ export type Database = {
   }
   public: {
     Tables: {
+      answers: {
+        Row: {
+          content: string
+          id: string
+          is_correct: boolean | null
+          meta: Json | null
+          question_id: string
+          type: string
+        }
+        Insert: {
+          content: string
+          id?: string
+          is_correct?: boolean | null
+          meta?: Json | null
+          question_id?: string
+          type: string
+        }
+        Update: {
+          content?: string
+          id?: string
+          is_correct?: boolean | null
+          meta?: Json | null
+          question_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       grades: {
         Row: {
           created_at: string
           id: string
           name: string
+          number: number
         }
         Insert: {
-          created_at?: string
+          created_at: string
           id?: string
           name: string
+          number: number
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          number?: number
         }
         Relationships: []
+      }
+      question_context: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          meta: Json | null
+          question_id: string
+          type: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          question_id?: string
+          type: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          question_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_context_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          content: string
+          created_at: string
+          font_key: string | null
+          id: string
+          meta: Json | null
+          topic_id: string
+          type: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          font_key?: string | null
+          id?: string
+          meta?: Json | null
+          topic_id?: string
+          type: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          font_key?: string | null
+          id?: string
+          meta?: Json | null
+          topic_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          created_at: string
+          grade_id: string
+          icon_key: string
+          id: string
+          name: string
+          ui_meta: Json | null
+        }
+        Insert: {
+          created_at?: string
+          grade_id?: string
+          icon_key: string
+          id?: string
+          name: string
+          ui_meta?: Json | null
+        }
+        Update: {
+          created_at?: string
+          grade_id?: string
+          icon_key?: string
+          id?: string
+          name?: string
+          ui_meta?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subjects_grade_id_fkey"
+            columns: ["grade_id"]
+            isOneToOne: false
+            referencedRelation: "grades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      topic_context: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          meta: Json | null
+          topic_id: string
+          type: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          topic_id?: string
+          type: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          topic_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topic_context_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      topics: {
+        Row: {
+          created_at: string
+          font_key: string | null
+          icon_key: string | null
+          id: string
+          name: string
+          subject_id: string
+        }
+        Insert: {
+          created_at?: string
+          font_key?: string | null
+          icon_key?: string | null
+          id?: string
+          name: string
+          subject_id?: string
+        }
+        Update: {
+          created_at?: string
+          font_key?: string | null
+          icon_key?: string | null
+          id?: string
+          name?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topics_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
