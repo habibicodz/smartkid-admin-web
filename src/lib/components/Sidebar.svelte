@@ -4,9 +4,11 @@
 	import SideMenuButton from './buttons/SideMenuButton.svelte';
 	import AddGradeDialog from './dialogs/AddGradeDialog.svelte';
 	import { getAppContext } from '$lib/state/AppState.svelte';
-
+	import { page } from '$app/state';
 	let appContext = getAppContext();
 	let showAddDialog = $state(false);
+
+	let selectedGradeId = $derived(page.params.gradeId);
 
 	const navigateTo = (path: string) => {
 		goto(path);
@@ -22,7 +24,7 @@
 	<div class="sidebar-scroll">
 		<SideMenuButton
 			title="Dashboard"
-			isSelected={false}
+			isSelected={page.url.pathname == '/'}
 			onclick={() => {
 				navigateTo('/');
 			}}
@@ -32,7 +34,7 @@
 		{/if}
 		{#each appContext.grades as grade}
 			<SideMenuButton
-				isSelected={false}
+				isSelected={grade.id == selectedGradeId}
 				title={grade.name}
 				onclick={() => navigateTo(`/grades/${grade.id}`)}
 			/>

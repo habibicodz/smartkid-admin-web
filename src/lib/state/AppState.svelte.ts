@@ -1,31 +1,14 @@
-import { supabaseClient } from "$lib/supabase_db/client/supabaseClient";
+import { getGrades, supabaseClient } from "$lib/supabase_db/client/supabaseClient";
 import type { Tables } from "$lib/supabase_db/database.types";
-import { getGrades } from "$lib/supabase_db/dbutil.remote";
-import type { NavigationTarget, Page } from "@sveltejs/kit";
 import { createContext } from "svelte";
-import { parseArgs } from "util";
 
 interface AppState {
     grades: Tables<"grades">[];
-    gradesLoading: boolean,
-    navState: NavState
+    gradesLoading: boolean
 }
 
-interface NavState {
-    selectedGradeId: string | undefined,
-    selectedSubjectId: string | undefined,
-    selectedTopicId: string | undefined
-}
 
 export class AppStateClass implements AppState {
-    navState: NavState = $state<NavState>({
-        selectedGradeId: undefined,
-        selectedSubjectId: undefined,
-        selectedTopicId: undefined
-    });
-
-
-
     grades = $state<Tables<"grades">[]>([]);
     gradesLoading = $state<boolean>(false);
 
@@ -56,14 +39,6 @@ export class AppStateClass implements AppState {
 
     pushGrade(...grade: Tables<"grades">[]) {
         this.grades.push(...grade);
-    }
-
-    setNavState(page: Page<{ gradeId?: string; }, "/" | "/grades" | "/grades/[gradeId]" | null>) {
-        this.navState.selectedGradeId = page.params.gradeId;
-    }
-
-    setNavState(target: NavigationTarget) {
-        this.navState.selectedGradeId = page.params.gradeId;
     }
 }
 

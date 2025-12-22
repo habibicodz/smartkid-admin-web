@@ -4,8 +4,8 @@
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import { AppStateClass, getAppContext, setAppContext } from '$lib/state/AppState.svelte';
 	import { onMount } from 'svelte';
-	import { page } from '$app/state';
 	import { afterNavigate } from '$app/navigation';
+	import Navbar from '$lib/sections/common/Navbar.svelte';
 	let { children } = $props();
 
 	setAppContext(new AppStateClass());
@@ -14,13 +14,8 @@
 
 	const prepareAppState = async () => {
 		await appContext.loadInitialData();
-		appContext.setNavState(page);
 		appContext.gradesChanges.subscribe();
 	};
-
-	afterNavigate(({ to }) => {
-		appContext.setNavState(to);
-	});
 
 	onMount(() => {
 		console.log('On Mount is called');
@@ -32,6 +27,7 @@
 <SEO />
 
 <main class="main-container">
+
 	<Sidebar />
 
 	<div class="content-container">
