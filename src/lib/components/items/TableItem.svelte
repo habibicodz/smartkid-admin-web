@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ArrowIcon from '$lib/assets/arrow-right.svg';
+	import TrashIcon from '$lib/assets/trash.svg';
 	import EditIcon from '$lib/assets/edit.svg';
 	import ActionButton from '$lib/components/buttons/ActionButton.svelte';
 
@@ -8,13 +9,15 @@
 		title,
 		description,
 		onitemclicked,
-		oneditclick
+		oneditclick,
+		ondeleteclick
 	}: {
 		id: string;
 		title?: string;
 		description?: string;
 		onitemclicked?: (id: string) => void;
-		oneditclick?: () => void;
+		oneditclick?: (id: string) => void;
+		ondeleteclick?: (id: string, title?: string) => void;
 	} = $props();
 </script>
 
@@ -27,14 +30,22 @@
 		{/if}
 	</div>
 
-	{#if oneditclick || onitemclicked}
+	{#if oneditclick || onitemclicked || ondeleteclick}
 		<div class="actions">
+			{#if ondeleteclick}
+				<ActionButton  type="danger" showTypeByDefault={true} icon={TrashIcon} onclick={() => ondeleteclick(id, title)} />
+			{/if}
+
 			{#if oneditclick}
-				<ActionButton icon={EditIcon} onclick={oneditclick} />
+				<ActionButton type="normal" icon={EditIcon} onclick={() => oneditclick(id)} />
 			{/if}
 
 			{#if onitemclicked}
 				<ActionButton
+				showTypeByDefault={true}
+					title="View"
+					shape="round"
+					type="primary"
 					icon={ArrowIcon}
 					onclick={() => onitemclicked(id)}
 				/>
@@ -56,7 +67,9 @@
 		background-color: white;
 		border-radius: 12px;
 
-		transition: transform 0.15s ease, box-shadow 0.15s ease;
+		transition:
+			transform 0.15s ease,
+			box-shadow 0.15s ease;
 	}
 
 	/* subtle depth on hover */

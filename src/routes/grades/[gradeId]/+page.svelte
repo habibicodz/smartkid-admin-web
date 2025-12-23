@@ -12,16 +12,29 @@
 	} from '$lib/supabase_db/client/supabaseClient';
 	import type { Tables } from '$lib/supabase_db/database.types';
 	import ButtonLoader from '$lib/components/loader/ButtonLoader.svelte';
-
+	import AlertDialog from '$lib/components/dialogs/AlertDialog.svelte';
+	import { deleteSubject } from '$lib/supabase_db/dbutil.remote';
+	import Searchbar from '$lib/components/items/Searchbar.svelte';
 	const gradeId: string = $derived(page.params.gradeId as string);
 
 	let grade = $state<Tables<'grades'> | null>(null);
 	let subjects = $state<Tables<'subjects'>[] | null>(null);
 	let showAddDialog = $state(false);
 	let showEditDialog = $state<Tables<'subjects'> | null>(null);
+	let showDeleteDialog = $state<Tables<'subjects'> | null>(null);
+	let progress = $state(false);
+	let searchbarvalue = $state('');
 
 	let subjectRequestId = 0;
 	let gradeRequestId = 0;
+
+	const deleteMySubject = async (subject: Tables<'subjects'>) => {
+		progress = true;
+		const result = await deleteSubject({ subject: subject });
+		console.log('The data successfully deleted');
+		showDeleteDialog = null;
+		progress = false;
+	};
 
 	/* Realtime updates */
 	$effect(() => {
@@ -46,8 +59,9 @@
 			)
 			.on(
 				'postgres_changes',
-				{ event: 'DELETE', schema: 'public', table: 'subjects', filter: `grade_id=eq.${id}` },
+				{ event: 'DELETE', schema: 'public', table: 'subjects' },
 				(payload) => {
+					console.log('Delete detected');
 					subjects = (subjects ?? []).filter((s) => s.id !== payload.old.id);
 				}
 			);
@@ -79,6 +93,16 @@
 	});
 </script>
 
+{#if showDeleteDialog != null}
+	<AlertDialog
+		title={showDeleteDialog.name}
+		description="Are you sure you want to delete {showDeleteDialog.name}? This action cannot be undone."
+		onNegativeClicked={() => (showDeleteDialog = null)}
+		onPositiveClicked={() => deleteMySubject(showDeleteDialog!)}
+		positiveLoading={progress}
+	/>
+{/if}
+
 <div class="container">
 	{#if grade}
 		<div class="back-stack-container">
@@ -90,20 +114,37 @@
 		{#if subjects === null}
 			<!-- Loading State -->
 			<div class="loading-wrapper">
-				<ButtonLoader/>
+				<ButtonLoader />
 				<p class="loading-text">Loading subjects...</p>
 			</div>
 		{:else if subjects.length === 0}
 			<!-- Empty State -->
 			<div class="empty-wrapper">
 				<p>No subjects available</p>
-				<ActionButton title="Add Subject" type="primary" onclick={() => (showAddDialog = true)} />
+				<ActionButton
+					title="Add Subject"
+					type="primary"
+					showTypeByDefault={true}
+					onclick={() => (showAddDialog = true)}
+				/>
 			</div>
 		{:else}
 			<!-- Loaded Data -->
 			<SectionHeader title="Subjects">
-				<ActionButton title="Add Subject" type="primary" onclick={() => (showAddDialog = true)} />
+				<ActionButton
+					title="Add Subject"
+					type="primary"
+					showTypeByDefault={true}
+					onclick={() => (showAddDialog = true)}
+				/>
 			</SectionHeader>
+
+			<Searchbar
+				value={searchbarvalue}
+				onValueChange={(value) => {
+					searchbarvalue = value;
+				}}
+			/>
 
 			<div class="items-container">
 				{#each subjects as item (item.id)}
@@ -112,6 +153,9 @@
 						title={item.name}
 						onitemclicked={() => {}}
 						oneditclick={() => (showEditDialog = item)}
+						ondeleteclick={(id, title) => {
+							showDeleteDialog = item;
+						}}
 					/>
 				{/each}
 			</div>

@@ -7,6 +7,11 @@ interface AppState {
     gradesLoading: boolean
 }
 
+export interface AlertDialogState {
+    title?: string,
+    description?: string
+}
+
 
 export class AppStateClass implements AppState {
     grades = $state<Tables<"grades">[]>([]);

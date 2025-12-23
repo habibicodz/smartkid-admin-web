@@ -1,7 +1,8 @@
 import { query } from "$app/server";
 import { assert } from "console";
-import type { TablesInsert, TablesUpdate } from "./database.types";
+import type { Tables, TablesInsert, TablesUpdate } from "./database.types";
 import { supabaseServer } from "./server/supabse.server";
+
 
 export const createGrade = query(
     "unchecked",
@@ -35,6 +36,15 @@ export const updateSubject = query(
         return error == null;
     }
 );
+
+export const deleteSubject = query(
+    "unchecked",
+    async (data: { "subject": Tables<"subjects"> }) => {
+        const { error } = await supabaseServer.from("subjects").delete().eq("id", data.subject.id);
+        assert(error == null, `${error?.message} ${error?.cause}`);
+        return error == null;
+    }
+)
 
 export const createTopic = query(
     "unchecked",

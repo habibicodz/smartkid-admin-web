@@ -28,7 +28,6 @@
 		onclose();
 	};
 </script>
-
 <Dialog {onclose}>
 	<div class="isolated-dialog">
 		<h3 class="title">{isCreateNew ? 'Create' : 'Update'} Grade</h3>
@@ -58,23 +57,25 @@
 		</div>
 
 		<div class="actions">
-			<button class="btn ghost" on:click={onclose} disabled={isLoading}>Cancel</button>
-			<button class="btn primary" on:click={submit} disabled={isLoading}>
-				{#if isLoading}
-					<ButtonLoader />
-				{:else}
-					{isCreateNew ? 'Create' : 'Update'}
-				{/if}
+			<button class="btn ghost" onclick={onclose} disabled={isLoading}>Cancel</button>
+			<button class="btn primary" onclick={submit} disabled={isLoading}>
+				{isCreateNew ? 'Create' : 'Update'}
 			</button>
 		</div>
+
+		{#if isLoading}
+			<div class="loading">
+				<ButtonLoader />
+			</div>
+		{/if}
 	</div>
 </Dialog>
 
 <style>
 	.isolated-dialog {
-		background-color: white; /* isolated background */
-		border-radius: 14px; 
-		box-shadow: 0 16px 36px rgba(0,0,0,0.15);
+		background-color: white;
+		border-radius: 14px;
+		box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15);
 		padding: 28px 24px;
 		min-width: 380px;
 		max-width: 480px;
@@ -165,7 +166,7 @@
 		background: rgb(235, 235, 235);
 	}
 
-	/* loading overlay inside isolated dialog */
+	/* Loading overlay covering the entire dialog */
 	.loading {
 		position: absolute;
 		inset: 0;
@@ -174,5 +175,6 @@
 		justify-content: center;
 		background: rgba(255, 255, 255, 0.7);
 		border-radius: 14px;
+		z-index: 10;
 	}
 </style>
