@@ -1,27 +1,19 @@
 <script lang="ts">
-	let { class: KClass }: { class?: string } = $props();
+	let size = 40;
 </script>
 
-<span class="{KClass} loader"></span>
+<div class="spinner" style="width: {size}px; height: {size}px"></div>
 
 <style>
-	.loader {
-		width: 48px;
-		height: 48px;
-		border: 2px solid #fff;
-		border-bottom-color: transparent;
+	.spinner {
+		border: 4px solid rgba(240, 240, 240, 0.1);
+		border-top-color: var(--color, rgb(52, 52, 52));
 		border-radius: 50%;
-		display: inline-block;
-		box-sizing: border-box;
-		animation: rotation 1s linear infinite;
+		animation: spin 1s linear infinite;
 	}
 
-	@keyframes rotation {
-		0% {
-			transform: rotate(0deg);
-		}
-		100% {
-			transform: rotate(360deg);
-		}
+	@keyframes spin {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
 	}
 </style>

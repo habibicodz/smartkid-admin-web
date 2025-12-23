@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { Tables, TablesInsert } from '$lib/supabase_db/database.types';
-	import { createSubject } from '$lib/supabase_db/dbutil.remote';
-	import ButtonLoader from '../loader/ButtonLoader.svelte';
+	import type { Tables, TablesInsert, TablesUpdate } from '$lib/supabase_db/database.types';
+	import { createSubject, updateSubject } from '$lib/supabase_db/dbutil.remote';
 	import Dialog from './Dialog.svelte';
+	import ButtonLoader from '../loader/ButtonLoader.svelte';
 
 	let {
 		onclose,
@@ -14,123 +14,168 @@
 		subject?: Tables<'subjects'> | null;
 	} = $props();
 
-	let isProgress = $state(false);
+	let isLoading = $state(false);
 	let isCreateNew = $derived(subject == null);
-	let subjectName = $state('');
+	let subjectName = $derived(subject?.name ?? '');
 
-	const submitOrCreateSubject = async () => {
-		if (isProgress) return;
+	const submit = async () => {
+		if (isLoading) return;
 
-		if (!subjectName || subjectName.length == 0) {
-			console.log('Invalid subject name');
-			return;
+		const name = subjectName.trim();
+		if (!name) return;
+
+		isLoading = true;
+
+		let ok = false;
+
+		if (isCreateNew) {
+			ok = await createSubject({
+				subject: {
+					id: undefined,
+					grade_id: grade.id,
+					created_at: new Date().toISOString(),
+					icon_key: '',
+					name
+				} as TablesInsert<'subjects'>
+			});
+		} else if (subject && subject.name !== name) {
+			ok = await updateSubject({
+				subject: { ...subject, name } as TablesUpdate<'subjects'>
+			});
+		} else {
+			ok = true;
 		}
 
-		isProgress = true;
-		if (subject != null) {
-			throw '';
-		}
-
-		const newSubject: TablesInsert<'subjects'> = {
-			id: undefined,
-			grade_id: grade.id,
-			created_at: new Date().toISOString(),
-			icon_key: '',
-			name: subjectName
-		};
-
-		await createSubject({
-			subject: newSubject
-		});
-		isProgress = false;
-		onclose();
+		isLoading = false;
+		if (ok) onclose();
 	};
 </script>
 
 <Dialog {onclose}>
-	<h3>
-		{isCreateNew ? 'Create' : 'Update'} Subject
-	</h3>
+	<div class="isolated-dialog">
+		<h3 class="title">{isCreateNew ? 'Create Subject' : 'Update Subject'}</h3>
 
-	<div class="input-group">
-		<label for="name">Enter Subject Name</label>
-		<input autocomplete="off" type="text" bind:value={subjectName} name="name" id="" />
-	</div>
+		<div class="field">
+			<label for="name">Subject Name</label>
+			<input type="text" name="name" bind:value={subjectName} disabled={isLoading} placeholder="Enter subject name" />
+		</div>
 
-	<div class="actions-container">
-		<button class="btn cancel-btn" onclick={onclose}>Cancel</button>
+		<div class="actions">
+			<button class="btn ghost" onclick={onclose} disabled={isLoading}>Cancel</button>
+			<button class="btn primary" onclick={submit} disabled={isLoading}>
+				{isCreateNew ? 'Create' : 'Update'}
+			</button>
+		</div>
 
-		<button class="btn" onclick={submitOrCreateSubject}>
-			{isCreateNew ? 'Create' : 'Update'}
-			{#if isProgress}
-				<ButtonLoader class="loader" />
-			{/if}
-		</button>
+		{#if isLoading}
+			<div class="loading">
+				<ButtonLoader />
+			</div>
+		{/if}
 	</div>
 </Dialog>
 
 <style>
-	.actions-container :global {
-		.loader {
-			justify-self: flex-end;
-			width: 20px;
-			height: 20px;
-		}
-	}
-
-	h3 {
-		font-weight: normal;
-		font-size: 1.2rem;
-	}
-
-	.actions-container {
-		display: flex;
-		justify-content: end;
-		flex-direction: row;
-		gap: 10px;
-	}
-
-	.input-group {
+	/* Fully isolated dialog box */
+	.isolated-dialog {
+		background-color: white; /* isolated background */
+		border-radius: 14px; /* round corners */
+		box-shadow: 0 16px 36px rgba(0,0,0,0.15);
+		padding: 28px 24px;
+		min-width: 380px;
+		max-width: 480px;
+		position: relative;
 		display: flex;
 		flex-direction: column;
-		gap: 5px;
+		gap: 18px;
+		color: black; /* text color independent of parent */
+	}
+
+	.title {
+		margin: 0;
+		font-size: 1.3rem;
+		font-weight: 600;
+	}
+
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	label {
+		font-size: 0.85rem;
+		color: rgb(90, 90, 90);
+	}
+
+	input {
+		background: rgb(245, 245, 245);
+		border: 1px solid transparent;
+		border-radius: 8px;
+		padding: 10px 12px;
+		font-size: 1rem;
+		color: black;
+		outline: none;
+		transition: box-shadow 120ms ease, border-color 120ms ease;
+	}
+
+	input:focus {
+		box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.4);
+		border-color: var(--color-primary);
+	}
+
+	input:disabled {
+		opacity: 0.6;
+	}
+
+	.actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 10px;
 	}
 
 	.btn {
+		min-width: 96px;
+		height: 38px;
+		border-radius: 8px;
+		border: none;
+		font-size: 0.95rem;
+		cursor: pointer;
+		transition: all 120ms ease;
+	}
+
+	.btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.primary {
+		background: var(--color-primary);
+		color: white;
+		font-weight: 600;
+	}
+
+	.primary:hover:not(:disabled) {
+		background: var(--color-primary-dark);
+	}
+
+	.ghost {
+		background: rgb(245, 245, 245);
+		color: black;
+	}
+
+	.ghost:hover:not(:disabled) {
+		background: rgb(235, 235, 235);
+	}
+
+	/* loading overlay inside isolated dialog */
+	.loading {
+		position: absolute;
+		inset: 0;
 		display: flex;
-		flex-direction: row;
 		align-items: center;
 		justify-content: center;
-		padding: 10px;
-		min-width: 100px;
-		min-height: 40px;
-		border-radius: 5px;
-		background-color: var(--color-primary);
-		color: white;
-		border: none;
-		gap: 10px;
-		font-size: 1rem;
-	}
-
-	.btn:hover {
-		cursor: pointer;
-		background-color: var(--color-primary-dark);
-	}
-
-	.cancel-btn {
-		background-color: rgb(243, 243, 243) !important;
-		color: black !important;
-	}
-	.cancel-btn:hover {
-		background-color: rgb(231, 231, 231) !important;
-	}
-
-	input[type='text'] {
-		background-color: rgb(243, 243, 243);
-		border: none;
-		border-radius: 5px;
-		padding: 10px;
-		color: black;
-		font-size: 1rem;
+		background: rgba(255, 255, 255, 0.7);
+		border-radius: 14px;
 	}
 </style>

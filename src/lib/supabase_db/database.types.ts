@@ -253,7 +253,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_items_counts: {
+        Args: never
+        Returns: {
+          grades: number
+          questions: number
+          subjects: number
+          topics: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

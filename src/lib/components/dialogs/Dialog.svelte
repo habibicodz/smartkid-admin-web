@@ -4,23 +4,19 @@
 
 <dialog
 	bind:this={dialog}
-	onclick={(event) => {
-		onclose();
-	}}
+	onclick={() => onclose()}
 >
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<!-- prevent clicks inside the child dialog from closing -->
 	<div
-		class="dialog"
-		onclick={(event) => {
-			event.stopPropagation();
-		}}
+		class="dialog-wrapper"
+		onclick={(event) => event.stopPropagation()}
 	>
 		{@render children()}
 	</div>
 </dialog>
 
 <style>
+	/* Fullscreen overlay */
 	dialog {
 		top: 0;
 		left: 0;
@@ -30,21 +26,30 @@
 		height: 100%;
 		position: fixed;
 		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: rgba(0, 0, 0, 0.1); /* overlay remains unchanged */
+		z-index: 999;
+	}
+
+	/* Wrapper around the child dialog */
+	.dialog-wrapper {
+		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		background-color: rgba(0, 0, 0, 0.1);
+		width: 100%;
+		height: 100%;
+		/* do NOT set background here, children handle their own styling */
 	}
 
-	.dialog {
-		display: flex;
-		flex-direction: column;
-		gap: 20px;
-		min-width: 400px;
-		padding: 20px;
-		background-color: white;
-		color: black;
-		border: 1px solid #d1d0d0;
-		border-radius: 10px;
+	/* Optional: smooth fade-in animation for overlay */
+	dialog {
+		animation: fadeIn 0.2s ease forwards;
+	}
+
+	@keyframes fadeIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
 	}
 </style>

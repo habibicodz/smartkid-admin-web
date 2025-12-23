@@ -1,18 +1,22 @@
 <script>
 	import StatNode from '$lib/components/items/StatNode.svelte';
-	import { getAppContext } from '$lib/state/AppState.svelte';
-
-	const appState = getAppContext();
+	import { getTablesCount } from '$lib/supabase_db/client/supabaseClient';
+	const counts = await getTablesCount();
 </script>
 
 <section class="container">
 	<h1>Dashboard</h1>
-	<div class="stats-container">
-		<StatNode title="Total grades" description={`${appState.grades.length}`} />
-		<StatNode title="Total Subjects" />
-		<StatNode title="Total Topics" />
-		<StatNode title="Total Quizzes" />
-	</div>
+
+	{#if counts != null}
+		<div class="stats-container">
+			<StatNode title="Total grades" description={`${counts[0].grades}`} />
+			<StatNode title="Total Subjects" description={`${counts[0].subjects}`} />
+			<StatNode title="Total Topics" description={`${counts[0].topics}`} />
+			<StatNode title="Total Quizzes" description={`${counts[0].questions}`} />
+		</div>
+	{:else}
+		<h1>Error getting data</h1>
+	{/if}
 </section>
 
 <style>

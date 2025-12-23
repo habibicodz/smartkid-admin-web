@@ -11,6 +11,11 @@ export const getGradeById = async (gradeId: string) => {
 
 export const getGrades = async () => {
     const result = await supabaseClient.from("grades").select();
+
+    if (result.error) {
+        return null;
+    }
+
     return result.data ?? [];
 };
 
@@ -22,4 +27,24 @@ export const getSubjects = async (gradeId: string) => {
     }
 
     return result.data ?? [];
+}
+
+export const getTopics = async (subjectId: string) => {
+    const result = await supabaseClient.from("topics").select().eq("subject_id", subjectId);
+
+    if (result.error) {
+        return null;
+    }
+
+    return result.data ?? [];
+}
+
+export const getTablesCount = async () => {
+    const { data, error } = await supabaseClient.rpc("get_items_counts");
+
+    if (error) {
+        return null;
+    }
+
+    return data;
 }

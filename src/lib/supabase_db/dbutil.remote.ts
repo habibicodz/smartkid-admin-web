@@ -1,6 +1,6 @@
 import { query } from "$app/server";
 import { assert } from "console";
-import type { TablesInsert } from "./database.types";
+import type { TablesInsert, TablesUpdate } from "./database.types";
 import { supabaseServer } from "./server/supabse.server";
 
 export const createGrade = query(
@@ -26,3 +26,21 @@ export const createSubject = query(
         return error == null;
     }
 );
+
+export const updateSubject = query(
+    "unchecked",
+    async (data: { "subject": TablesUpdate<"subjects"> }) => {
+        const { error } = await supabaseServer.from("subjects").update(data.subject).eq("id", data.subject.id!);
+        assert(error == null, `${error?.message} ${error?.cause}`);
+        return error == null;
+    }
+);
+
+export const createTopic = query(
+    "unchecked",
+    async (data: { "topic": TablesInsert<"topics"> }) => {
+        const { error } = await supabaseServer.from("topics").insert(data.topic)
+        assert(error == null, `${error?.message} ${error?.cause}`)
+        return error == null;
+    }
+)

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import DataContainer from '$lib/components/container/DataContainer.svelte';
+	import ActionButton from '$lib/components/buttons/ActionButton.svelte';
 	import AddSubjectDialog from '$lib/components/dialogs/AddSubjectDialog.svelte';
-	import SubjectsListHeader from '$lib/components/headers/SubjectsListHeader.svelte';
+	import SectionHeader from '$lib/components/headers/SectionHeader.svelte';
 	import TableItem from '$lib/components/items/TableItem.svelte';
 	import BackStackComponent from '$lib/components/ui/BackStackComponent.svelte';
 	import {
@@ -11,137 +11,192 @@
 		supabaseClient
 	} from '$lib/supabase_db/client/supabaseClient';
 	import type { Tables } from '$lib/supabase_db/database.types';
+	import ButtonLoader from '$lib/components/loader/ButtonLoader.svelte';
 
-	/* reactive param */
 	const gradeId: string = $derived(page.params.gradeId as string);
 
-	/* state */
 	let grade = $state<Tables<'grades'> | null>(null);
-	let subjects = $state<Tables<'subjects'>[] | null | undefined>(undefined);
+	let subjects = $state<Tables<'subjects'>[] | null>(null);
 	let showAddDialog = $state(false);
+	let showEditDialog = $state<Tables<'subjects'> | null>(null);
 
-	/* prevents async overwrites */
 	let subjectRequestId = 0;
 	let gradeRequestId = 0;
 
-	/* enable realtime */
-
+	/* Realtime updates */
 	$effect(() => {
 		const id = gradeId;
-		console.log('Listening for grade: ' + id);
-		const realtime = supabaseClient.channel('subject_realtime_channel').on(
-			'postgres_changes',
-			{
-				event: '*',
-				schema: 'public',
-				table: 'subjects',
-				filter: `grade_id=eq.${id}`
-			},
-			(payload) => {
-				const result = payload.new as Tables<'subjects'>;
-				console.log(`log: ${result}`);
-				subjects?.push(result);
-			}
-		);
+		const realtime = supabaseClient
+			.channel('subject_realtime_channel')
+			.on(
+				'postgres_changes',
+				{ event: 'INSERT', schema: 'public', table: 'subjects', filter: `grade_id=eq.${id}` },
+				(payload) => {
+					subjects = [...(subjects ?? []), payload.new as Tables<'subjects'>];
+				}
+			)
+			.on(
+				'postgres_changes',
+				{ event: 'UPDATE', schema: 'public', table: 'subjects', filter: `grade_id=eq.${id}` },
+				(payload) => {
+					subjects = (subjects ?? []).map((s) =>
+						s.id === payload.new.id ? (payload.new as Tables<'subjects'>) : s
+					);
+				}
+			)
+			.on(
+				'postgres_changes',
+				{ event: 'DELETE', schema: 'public', table: 'subjects', filter: `grade_id=eq.${id}` },
+				(payload) => {
+					subjects = (subjects ?? []).filter((s) => s.id !== payload.old.id);
+				}
+			);
 
 		realtime.subscribe();
-
-		return () => {
-			realtime.unsubscribe();
-		};
+		return () => realtime.unsubscribe();
 	});
 
-	/* load grade */
+	/* Load grade */
 	$effect(() => {
-		const id = gradeId;
 		const reqId = ++gradeRequestId;
-
 		grade = null;
 
-		getGradeById(id).then((result) => {
+		getGradeById(gradeId).then((result) => {
 			if (reqId !== gradeRequestId) return;
 			grade = result as Tables<'grades'>;
 		});
 	});
 
-	/* load subjects */
+	/* Load subjects */
 	$effect(() => {
-		const id = gradeId;
 		const reqId = ++subjectRequestId;
+		subjects = null;
 
-		subjects = undefined;
-
-		getSubjects(id).then((result) => {
+		getSubjects(gradeId).then((result) => {
 			if (reqId !== subjectRequestId) return;
-			subjects = result;
+			subjects = result ?? [];
 		});
 	});
 </script>
 
-{#snippet SubjectsData(data: Tables<'subjects'>[])}
-	<SubjectsListHeader
-		onAddClicked={() => {
-			showAddDialog = true;
-		}}
-	/>
-
-	<div class="items-container">
-		{#each data as item}
-			<TableItem title={item.name} />
-		{/each}
-	</div>
-{/snippet}
-
-{#if showAddDialog && grade}
-	<AddSubjectDialog
-		{grade}
-		onclose={() => {
-			showAddDialog = false;
-		}}
-	/>
-{/if}
-
 <div class="container">
-	<div class="back-stack-container">
-		{#if grade}
-			<BackStackComponent
-				items={[
-					{ key: grade.id, value: grade.name },
-					{ key: 'wqe', value: 'sd' }
-				]}
-			/>
+	{#if grade}
+		<div class="back-stack-container">
+			<BackStackComponent items={[{ key: grade.id, value: grade.name }]} />
+		</div>
+	{/if}
+
+	<div class="data-container">
+		{#if subjects === null}
+			<!-- Loading State -->
+			<div class="loading-wrapper">
+				<ButtonLoader/>
+				<p class="loading-text">Loading subjects...</p>
+			</div>
+		{:else if subjects.length === 0}
+			<!-- Empty State -->
+			<div class="empty-wrapper">
+				<p>No subjects available</p>
+				<ActionButton title="Add Subject" type="primary" onclick={() => (showAddDialog = true)} />
+			</div>
+		{:else}
+			<!-- Loaded Data -->
+			<SectionHeader title="Subjects">
+				<ActionButton title="Add Subject" type="primary" onclick={() => (showAddDialog = true)} />
+			</SectionHeader>
+
+			<div class="items-container">
+				{#each subjects as item (item.id)}
+					<TableItem
+						id={item.id}
+						title={item.name}
+						onitemclicked={() => {}}
+						oneditclick={() => (showEditDialog = item)}
+					/>
+				{/each}
+			</div>
 		{/if}
 	</div>
-
-	<DataContainer>
-		<div class="data-container">
-			{#if subjects == undefined}
-				<h3>Loading your data</h3>
-			{:else if subjects == null}
-				<h3>Error loading data</h3>
-			{:else}
-				{@render SubjectsData(subjects)}
-			{/if}
-		</div>
-	</DataContainer>
 </div>
 
+{#if showAddDialog && grade}
+	<AddSubjectDialog {grade} onclose={() => (showAddDialog = false)} />
+{/if}
+
+{#if showEditDialog && grade}
+	<AddSubjectDialog {grade} subject={showEditDialog} onclose={() => (showEditDialog = null)} />
+{/if}
+
 <style>
+	/* Layout */
 	.container {
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		position: relative;
+		padding: 16px 0;
+	}
+
+	.back-stack-container {
+		margin-bottom: 12px;
 	}
 
 	.data-container {
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		position: relative;
+		gap: 12px;
 	}
 
 	.items-container {
 		display: flex;
 		flex-direction: column;
-		gap: 5px;
+		gap: 12px;
+	}
+
+	.loading-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 40px 0;
+		color: rgb(90, 90, 90);
+	}
+
+	.loading-text {
+		margin-top: 8px;
+		font-size: 0.95rem;
+		color: rgb(90, 90, 90);
+	}
+
+	/* Empty State */
+	.empty-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 40px 0;
+		gap: 10px;
+		color: rgb(120, 120, 120);
+	}
+
+	.empty-wrapper p {
+		font-style: italic;
+		font-weight: 400;
+	}
+
+	/* TableItem Cards */
+	.items-container > :global(*) {
+		background: white;
+		border-radius: 10px;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+		padding: 12px 16px;
+		transition:
+			transform 0.1s ease,
+			box-shadow 0.15s ease;
+	}
+
+	.items-container > :global(*:hover) {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 	}
 </style>
