@@ -5,8 +5,8 @@
 
 <div class="searchbar-container">
 	<input type="text" placeholder="Search..." bind:value oninput={() => onValueChange?.(value)} />
+	<!-- svelte-ignore a11y_consider_explicit_label -->
 	<button class="go-button" onclick={() => onValueChange?.(value)}>
-		<!-- Go icon -->
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 24 24"
@@ -27,12 +27,16 @@
 		background: white;
 		border-radius: 9999px;
 		padding: 4px 8px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-		transition: box-shadow 0.2s ease;
+		transition:
+			box-shadow 0.2s ease,
+			border 0.2s ease;
+		border: 1px solid transparent;
 	}
 
-	.searchbar-container:hover {
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	.searchbar-container:focus-within {
+		background: #ffffff;
+		border: 1px solid #d1d5db;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 	}
 
 	input {
@@ -60,14 +64,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition:
-			background 0.2s ease,
-			transform 0.1s ease;
-	}
-
-	.go-button:hover {
-		background: #357ae8;
-		transform: scale(1.05);
+		transition: transform 0.1s ease;
 	}
 
 	.go-button:active {

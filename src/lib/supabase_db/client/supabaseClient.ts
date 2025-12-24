@@ -29,6 +29,11 @@ export const getSubjects = async (gradeId: string) => {
     return result.data ?? [];
 }
 
+export const getSubjectById = async (id: string) => {
+    const result = await supabaseClient.from("subjects").select().eq("id", id).limit(1);
+    return result.data?.[0] ?? undefined;
+}
+
 export const getTopics = async (subjectId: string) => {
     const result = await supabaseClient.from("topics").select().eq("subject_id", subjectId);
 

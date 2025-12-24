@@ -3,7 +3,6 @@ import { assert } from "console";
 import type { Tables, TablesInsert, TablesUpdate } from "./database.types";
 import { supabaseServer } from "./server/supabse.server";
 
-
 export const createGrade = query(
     "unchecked",
     async (data: { "number": number, name: string }) => {
@@ -18,6 +17,15 @@ export const createGrade = query(
         return error == null;
     }
 );
+
+export const updateGrade = query(
+    "unchecked",
+    async (data: { "grade": Tables<"grades"> }) => {
+        const { error } = await supabaseServer.from("grades").update(data.grade).eq("id", data.grade.id);
+        assert(error == null, `${error?.message} ${error?.cause}`);
+        return error == null;
+    }
+)
 
 export const createSubject = query(
     "unchecked",
@@ -54,3 +62,21 @@ export const createTopic = query(
         return error == null;
     }
 )
+
+export const updateTopic = query(
+    "unchecked",
+    async (data: { "topic": TablesUpdate<"topics"> }) => {
+        const { error } = await supabaseServer.from("topics").update(data.topic).eq("id", data.topic.id!);
+        assert(error == null, `${error?.message} ${error?.cause}`);
+        return error == null;
+    }
+);
+
+export const deleteTopic = query(
+    "unchecked",
+    async (data: { "topic": Tables<"topics"> }) => {
+        const { error } = await supabaseServer.from("topics").delete().eq("id", data.topic.id!);
+        assert(error == null, `${error?.message} ${error?.cause}`);
+        return error == null;
+    }
+);

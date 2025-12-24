@@ -1,27 +1,27 @@
 <script lang="ts">
 	import type { Tables, TablesInsert, TablesUpdate } from '$lib/supabase_db/database.types';
-	import { createSubject, updateSubject } from '$lib/supabase_db/dbutil.remote';
+	import { createSubject, createTopic, updateSubject, updateTopic } from '$lib/supabase_db/dbutil.remote';
 	import Dialog from './Dialog.svelte';
 	import ButtonLoader from '../loader/ButtonLoader.svelte';
 
 	let {
 		onclose,
-		grade,
-		subject = null
+		subject,
+		topic = null
 	}: {
 		onclose: () => void;
-		grade: Tables<'grades'>;
-		subject?: Tables<'subjects'> | null;
+		subject: Tables<'subjects'>;
+		topic?: Tables<"topics"> | null
 	} = $props();
 
 	let isLoading = $state(false);
-	let isCreateNew = $derived(subject == null);
-	let subjectName = $derived(subject?.name ?? '');
+	let isCreateNew = $derived(topic == null);
+	let topicName = $derived(topic?.name ?? '');
 
 	const submit = async () => {
 		if (isLoading) return;
 
-		const name = subjectName.trim();
+		const name = topicName.trim();
 		if (!name) return;
 
 		isLoading = true;
@@ -29,18 +29,18 @@
 		let ok = false;
 
 		if (isCreateNew) {
-			ok = await createSubject({
-				subject: {
+			ok = await createTopic({
+				topic: {
 					id: undefined,
-					grade_id: grade.id,
+					subject_id: subject.id,
 					created_at: new Date().toISOString(),
 					icon_key: '',
 					name
-				} as TablesInsert<'subjects'>
+				} as TablesInsert<'topics'>
 			});
 		} else if (subject && subject.name !== name) {
-			ok = await updateSubject({
-				subject: { ...subject, name } as TablesUpdate<'subjects'>
+			ok = await updateTopic({
+				topic: { ...topic, name } as TablesUpdate<'subjects'>
 			});
 		} else {
 			ok = true;
@@ -53,22 +53,22 @@
 
 <Dialog {onclose}>
 	<div class="isolated-dialog">
-		<h3 class="title">{isCreateNew ? 'Create Subject' : 'Update Subject'}</h3>
+		<h3 class="title">{isCreateNew ? 'Create Topic' : 'Update Topic'}</h3>
 
 		<!-- ID (only when updating) -->
-		{#if !isCreateNew && subject}
+		{#if !isCreateNew && topic}
 			<div class="field id-field">
-				<label>Subject ID</label>
-				<input type="text" value={subject.id} disabled />
+				<label for="id">Topic ID</label>
+				<input name="id" type="text" value={topic.id} disabled />
 			</div>
 		{/if}
 
 		<div class="field">
-			<label for="name">Subject Name</label>
+			<label for="name">Topic Name</label>
 			<input
 				type="text"
 				name="name"
-				bind:value={subjectName}
+				bind:value={topicName}
 				disabled={isLoading}
 				placeholder="Enter subject name"
 			/>

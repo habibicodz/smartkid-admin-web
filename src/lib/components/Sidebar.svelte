@@ -41,7 +41,7 @@
 			<SideMenuButton
 				isSelected={grade.id == selectedGradeId}
 				title={grade.name}
-				onclick={() => navigateTo(`/grades/${grade.id}`)}
+				onclick={() => navigateTo(`/subjects/${grade.id}`)}
 			/>
 		{/each}
 

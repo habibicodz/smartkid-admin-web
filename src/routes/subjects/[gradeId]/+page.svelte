@@ -15,6 +15,9 @@
 	import AlertDialog from '$lib/components/dialogs/AlertDialog.svelte';
 	import { deleteSubject } from '$lib/supabase_db/dbutil.remote';
 	import Searchbar from '$lib/components/items/Searchbar.svelte';
+	import { goto } from '$app/navigation';
+	import GridCard from '$lib/components/cards/GridCard.svelte';
+
 	const gradeId: string = $derived(page.params.gradeId as string);
 
 	let grade = $state<Tables<'grades'> | null>(null);
@@ -30,10 +33,13 @@
 
 	const deleteMySubject = async (subject: Tables<'subjects'>) => {
 		progress = true;
-		const result = await deleteSubject({ subject: subject });
-		console.log('The data successfully deleted');
+		await deleteSubject({ subject });
 		showDeleteDialog = null;
 		progress = false;
+	};
+
+	const navigateToTopics = (item: Tables<'subjects'>) => {
+		goto(`/topics/${item.id}`);
 	};
 
 	/* Realtime updates */
@@ -61,7 +67,6 @@
 				'postgres_changes',
 				{ event: 'DELETE', schema: 'public', table: 'subjects' },
 				(payload) => {
-					console.log('Delete detected');
 					subjects = (subjects ?? []).filter((s) => s.id !== payload.old.id);
 				}
 			);
@@ -95,7 +100,7 @@
 
 {#if showDeleteDialog != null}
 	<AlertDialog
-		title={showDeleteDialog.name}
+		title={'Delete?'}
 		description="Are you sure you want to delete {showDeleteDialog.name}? This action cannot be undone."
 		onNegativeClicked={() => (showDeleteDialog = null)}
 		onPositiveClicked={() => deleteMySubject(showDeleteDialog!)}
@@ -104,21 +109,13 @@
 {/if}
 
 <div class="container">
-	{#if grade}
-		<div class="back-stack-container">
-			<BackStackComponent items={[{ key: grade.id, value: grade.name }]} />
-		</div>
-	{/if}
-
 	<div class="data-container">
 		{#if subjects === null}
-			<!-- Loading State -->
 			<div class="loading-wrapper">
 				<ButtonLoader />
 				<p class="loading-text">Loading subjects...</p>
 			</div>
 		{:else if subjects.length === 0}
-			<!-- Empty State -->
 			<div class="empty-wrapper">
 				<p>No subjects available</p>
 				<ActionButton
@@ -129,7 +126,6 @@
 				/>
 			</div>
 		{:else}
-			<!-- Loaded Data -->
 			<SectionHeader title="Subjects">
 				<ActionButton
 					title="Add Subject"
@@ -139,22 +135,19 @@
 				/>
 			</SectionHeader>
 
-			<Searchbar
-				value={searchbarvalue}
-				onValueChange={(value) => {
-					searchbarvalue = value;
-				}}
-			/>
-
 			<div class="items-container">
 				{#each subjects as item (item.id)}
-					<TableItem
+					<GridCard
 						id={item.id}
 						title={item.name}
-						onitemclicked={() => {}}
-						oneditclick={() => (showEditDialog = item)}
-						ondeleteclick={(id, title) => {
+						oneditclick={() => {
+							showEditDialog = item;
+						}}
+						ondeleteclick={() => {
 							showDeleteDialog = item;
+						}}
+						onitemclicked={() => {
+							navigateToTopics(item);
 						}}
 					/>
 				{/each}
@@ -172,29 +165,30 @@
 {/if}
 
 <style>
-	/* Layout */
 	.container {
 		display: flex;
 		flex-direction: column;
 		position: relative;
-		padding: 16px 0;
+		padding: 20px;
+		gap: 24px;
 	}
 
 	.back-stack-container {
-		margin-bottom: 12px;
+		margin-bottom: 16px;
 	}
 
 	.data-container {
 		display: flex;
 		flex-direction: column;
 		position: relative;
-		gap: 12px;
+		gap: 20px;
 	}
 
 	.items-container {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		gap: 16px;
+		width: 100%;
 	}
 
 	.loading-wrapper {
@@ -202,24 +196,23 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 40px 0;
+		padding: 60px 0;
 		color: rgb(90, 90, 90);
 	}
 
 	.loading-text {
-		margin-top: 8px;
+		margin-top: 12px;
 		font-size: 0.95rem;
 		color: rgb(90, 90, 90);
 	}
 
-	/* Empty State */
 	.empty-wrapper {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		padding: 40px 0;
-		gap: 10px;
+		padding: 60px 0;
+		gap: 12px;
 		color: rgb(120, 120, 120);
 	}
 
@@ -231,16 +224,16 @@
 	/* TableItem Cards */
 	.items-container > :global(*) {
 		background: white;
-		border-radius: 10px;
+		border-radius: 12px;
 		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-		padding: 12px 16px;
+		padding: 16px;
 		transition:
 			transform 0.1s ease,
 			box-shadow 0.15s ease;
 	}
 
 	.items-container > :global(*:hover) {
-		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+		transform: translateY(-2px);
+		box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 	}
 </style>

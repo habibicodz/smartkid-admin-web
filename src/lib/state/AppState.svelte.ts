@@ -21,29 +21,75 @@ export class AppStateClass implements AppState {
         this.gradesLoading = true;
         const initialData = await getGrades();
         this.gradesLoading = false;
-        this.pushGrade(...initialData);
+        this.pushGrade(...initialData ?? []);
     };
 
 
 
-    gradesChanges = supabaseClient.channel('realtime_grade_changes').on(
-        'postgres_changes',
-        {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'grades'
-        },
-
-        (payload) => {
-            const grade = payload.new as Tables<'grades'>;
-            this.pushGrade(grade);
-        }
-    )
+    gradesChanges = supabaseClient
+        .channel('realtime_grade_changes')
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'grades'
+            },
+            (payload) => {
+                const grade = payload.new as Tables<'grades'>;
+                this.pushGrade(grade);
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'grades'
+            },
+            (payload) => {
+                const grade = payload.new as Tables<'grades'>;
+                this.updateGrade(grade);
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: 'DELETE',
+                schema: 'public',
+                table: 'grades'
+            },
+            (payload) => {
+                const gradeId = payload.old.id as string;
+                this.removeGrade(gradeId);
+            }
+        )
 
     AppStateClass() { }
 
-    pushGrade(...grade: Tables<"grades">[]) {
-        this.grades.push(...grade);
+    // Add new grades
+    pushGrade(...grades: Tables<'grades'>[]) {
+        this.grades.push(...grades);
+    }
+
+    // Update existing grade(s) by ID
+    updateGrade(...grades: Tables<'grades'>[]) {
+        grades.forEach((updatedGrade) => {
+            const index = this.grades.findIndex((g) => g.id === updatedGrade.id);
+            if (index !== -1) {
+                this.grades[index] = updatedGrade;
+            }
+        });
+    }
+
+    // Remove grade(s) by ID
+    removeGrade(...gradeIds: string[]) {
+        gradeIds.forEach((id) => {
+            const index = this.grades.findIndex((g) => g.id === id);
+            if (index !== -1) {
+                this.grades.splice(index, 1);
+            }
+        });
     }
 }
 
