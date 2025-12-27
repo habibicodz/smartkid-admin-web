@@ -66,7 +66,6 @@
 	.content-container {
 		flex: 1;
 		overflow-y: auto;
-		padding: 40px;
 	}
 
 	/* Screen warning overlay */

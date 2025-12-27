@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
 	import { getAppContext } from '$lib/state/AppState.svelte';
 	import AddGradeDialog from '$lib/components/dialogs/AddGradeDialog.svelte';
-	import EntityCard from '$lib/components/cards/EntityCard.svelte';
 	import type { Tables } from '$lib/supabase_db/database.types';
 	import GridCard from '$lib/components/cards/GridCard.svelte';
 	let appContext = getAppContext();

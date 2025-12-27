@@ -40,6 +40,7 @@
 		"@supabase/ssr": "^0.8.0",
 		"@supabase/supabase-js": "^2.87.1",
 		"@tailwindcss/vite": "^4.1.18",
-		"tailwindcss": "^4.1.18"
+		"tailwindcss": "^4.1.18",
+		"uuid": "^13.0.0"
 	}
 }

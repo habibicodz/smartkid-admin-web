@@ -3,8 +3,6 @@
 	import ActionButton from '$lib/components/buttons/ActionButton.svelte';
 	import AddSubjectDialog from '$lib/components/dialogs/AddSubjectDialog.svelte';
 	import SectionHeader from '$lib/components/headers/SectionHeader.svelte';
-	import TableItem from '$lib/components/items/TableItem.svelte';
-	import BackStackComponent from '$lib/components/ui/BackStackComponent.svelte';
 	import {
 		getGradeById,
 		getSubjects,
@@ -14,11 +12,10 @@
 	import ButtonLoader from '$lib/components/loader/ButtonLoader.svelte';
 	import AlertDialog from '$lib/components/dialogs/AlertDialog.svelte';
 	import { deleteSubject } from '$lib/supabase_db/dbutil.remote';
-	import Searchbar from '$lib/components/items/Searchbar.svelte';
 	import { goto } from '$app/navigation';
 	import GridCard from '$lib/components/cards/GridCard.svelte';
 
-	const gradeId: string = $derived(page.params.gradeId as string);
+	const gradeId: string = $derived(page.params.gradeid as string);
 
 	let grade = $state<Tables<'grades'> | null>(null);
 	let subjects = $state<Tables<'subjects'>[] | null>(null);
@@ -33,7 +30,7 @@
 
 	const deleteMySubject = async (subject: Tables<'subjects'>) => {
 		progress = true;
-		await deleteSubject({ subject });
+		await deleteSubject({subject: subject});
 		showDeleteDialog = null;
 		progress = false;
 	};
@@ -98,16 +95,6 @@
 	});
 </script>
 
-{#if showDeleteDialog != null}
-	<AlertDialog
-		title={'Delete?'}
-		description="Are you sure you want to delete {showDeleteDialog.name}? This action cannot be undone."
-		onNegativeClicked={() => (showDeleteDialog = null)}
-		onPositiveClicked={() => deleteMySubject(showDeleteDialog!)}
-		positiveLoading={progress}
-	/>
-{/if}
-
 <div class="container">
 	<div class="data-container">
 		{#if subjects === null}
@@ -155,6 +142,16 @@
 		{/if}
 	</div>
 </div>
+
+{#if showDeleteDialog != null}
+	<AlertDialog
+		title={'Delete?'}
+		description="Are you sure you want to delete {showDeleteDialog.name}? This action cannot be undone."
+		onNegativeClicked={() => (showDeleteDialog = null)}
+		onPositiveClicked={() => deleteMySubject(showDeleteDialog!)}
+		positiveLoading={progress}
+	/>
+{/if}
 
 {#if showAddDialog && grade}
 	<AddSubjectDialog {grade} onclose={() => (showAddDialog = false)} />

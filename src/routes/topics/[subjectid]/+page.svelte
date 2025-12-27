@@ -15,7 +15,7 @@
 	import AddTopicDialog from '$lib/components/dialogs/AddTopicDialog.svelte';
 	import { deleteTopic } from '$lib/supabase_db/dbutil.remote';
 
-	const subjectId: string = $derived(page.params.subjectId as string);
+	const subjectId: string = $derived(page.params.subjectid as string);
 	let subject = $state<Tables<'subjects'> | null>(null);
 	let topics = $state<Tables<'topics'>[] | null>(null);
 
@@ -34,7 +34,7 @@
 		progress = false;
 	};
 
-	const navigateToQuizzes = (item: Tables<'topics'>) => {
+	const openQuizzes = (item: Tables<'topics'>) => {
 		goto(`/questions/${item.id}`);
 	};
 
@@ -132,7 +132,7 @@
 						title={item.name}
 						oneditclick={() => (showEditDialog = item)}
 						ondeleteclick={() => (showDeleteDialog = item)}
-						onitemclicked={() => navigateToQuizzes(item)}
+						onitemclicked={() => openQuizzes(item)}
 					/>
 				{/each}
 			</div>

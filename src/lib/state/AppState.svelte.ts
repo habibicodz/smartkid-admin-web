@@ -4,7 +4,8 @@ import { createContext } from "svelte";
 
 interface AppState {
     grades: Tables<"grades">[];
-    gradesLoading: boolean
+    gradesLoading: boolean,
+    message: string | null
 }
 
 export interface AlertDialogState {
@@ -16,16 +17,7 @@ export interface AlertDialogState {
 export class AppStateClass implements AppState {
     grades = $state<Tables<"grades">[]>([]);
     gradesLoading = $state<boolean>(false);
-
-    loadInitialData = async () => {
-        this.gradesLoading = true;
-        const initialData = await getGrades();
-        this.gradesLoading = false;
-        this.pushGrade(...initialData ?? []);
-    };
-
-
-
+    message: string | null = $state(null);
     gradesChanges = supabaseClient
         .channel('realtime_grade_changes')
         .on(
@@ -66,6 +58,17 @@ export class AppStateClass implements AppState {
         )
 
     AppStateClass() { }
+
+    loadInitialData = async () => {
+        this.gradesLoading = true;
+        const initialData = await getGrades();
+        this.gradesLoading = false;
+        this.pushGrade(...initialData ?? []);
+    };
+
+    showMessage(message: string) {
+        this.message = message;
+    }
 
     // Add new grades
     pushGrade(...grades: Tables<'grades'>[]) {
